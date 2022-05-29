@@ -1,44 +1,43 @@
 package com.application.book.model;
 
 import javax.persistence.*;
+/**
+CREATE TABLE IF NOT EXISTS books
+        (
+        id integer PRIMARY KEY NOT NULL,
+        title text NOT NULL,
+        author text NOT NULL,
+        year integer NOT NULL,
+        publisher text,
+        description text,
+
+        CONSTRAINT unique_constraint UNIQUE (title, author, year)
+        );
+ */
 
 @Entity
 @Table(name="books")
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name="id", nullable = false)
     private Integer id;
 
-    @Column(nullable = false)
+    @Column(name="title", nullable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column(name="author", nullable = false)
     private String author;
 
-    @Column(nullable = false)
+    @Column(name="year", nullable = false)
     private Integer year;
 
-    @Column
+    @Column(name="publisher")
     private String publisher;
-    @Column
+    @Column(name="description")
     private String description;
 
-    public Book() {
-
-    }
-
-    public Book(String title, String author, Integer year) {
-        this.title = title;
-        this.author = author;
-        this.year = year;
-    }
-
-    public Book(String title, String author, Integer year, String publisher) {
-        this.title = title;
-        this.author = author;
-        this.year = year;
-        this.publisher = publisher;
-    }
+    public Book() { }
 
     public Book(String title, String author, Integer year, String publisher, String description) {
         this.title = title;
@@ -99,5 +98,9 @@ public class Book {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isValid() {
+        return title != null && author != null && year != null;
     }
 }

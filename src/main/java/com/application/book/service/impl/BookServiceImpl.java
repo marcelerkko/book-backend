@@ -1,9 +1,11 @@
 package com.application.book.service.impl;
 
+import com.application.book.exception.IllegalEntityException;
 import com.application.book.model.Book;
 import com.application.book.service.BookRepository;
 import com.application.book.service.BookService;
 import org.springframework.stereotype.Service;
+import org.sqlite.SQLiteException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,10 +49,14 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public boolean addBook(Book book) {
+    public boolean addBook(Book book) throws IllegalEntityException {
+        if (!book.isValid()) {
+            throw new IllegalEntityException("Entity is missing title, author, or year");
+        }
+
         try {
-            bookRepository.save(book);
-        } catch (Exception e) { // PropertyValueException not properly caught?
+            bookRepository.save(book); // documentation shows it throws below exception if arguments are illegal
+        } catch (Exception e) {
             return false;
         }
         return true;

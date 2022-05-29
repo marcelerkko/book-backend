@@ -2,69 +2,207 @@ package com.application.book;
 
 import com.application.book.controller.BookController;
 import com.application.book.model.Book;
-import com.application.book.service.BookRepository;
 import com.application.book.service.BookService;
-import com.application.book.service.impl.BookServiceImpl;
 import org.junit.Before;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-@ExtendWith(MockitoExtension.class)
-class BookApplicationTests {
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-	@Mock
-	private RestTemplate restTemplate;
+@RunWith(MockitoJUnitRunner.class)
+public class BookApplicationTests {
+	MockMvc mockMvc;
 
 	@InjectMocks
-	BookServiceImpl bookService;
+	private BookController bookController;
 
-	@Test
-	public void testAddBookSuccess() {
-//		MockHttpServletRequest request = new MockHttpServletRequest();
-//		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
-//
-//		when(bookService.addBook(any(Book.class))).thenReturn(true);
-//
-//		Book book = new Book("Harry Potter and the Philosophers Stone", "J.K. Rowling", 1997, "Bloomsbury (UK)", "A book about a wizard boy");
-//		ResponseEntity<?> responseEntity = bookController.postBook(book);
-//
-//		assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+	@Mock
+	private BookService bookService;
 
-		Book book = new Book("Harry Potter and the Philosophers Stone", "J.K. Rowling", 1997, "Bloomsbury (UK)", "A book about a wizard boy");
-		Integer id = book.getId();
-		when(restTemplate.getForEntity("http://localhost:9000/books/" + id, Book.class))
-				.thenReturn(new ResponseEntity<>(book, HttpStatus.OK));
-
-		Book getBook = bookService.getBook(id);
-		assertEquals(book, getBook);
+	@Before
+	public void preTest() {
+		mockMvc = MockMvcBuilders.standaloneSetup(bookController).build();
 	}
 
-//	@Test
-//	public void testAddBookFail() {
-//		MockHttpServletRequest request = new MockHttpServletRequest();
-//		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
-//
-//		when(bookService.addBook(any(Book.class))).thenReturn(true);
-//
-//		Book book = new Book(null, null, null, "Bloomsbury (UK)", "A book about a wizard boy");
-//		ResponseEntity<?> responseEntity = bookController.postBook(book);
-//
-//		assertThat(responseEntity.getStatusCodeValue()).isEqualTo(400);
-//	}
+	@Test
+	public void contextLoads() {
+		assertThat(bookController).isNotNull();
+		assertThat(bookService).isNotNull();
+	}
+
+	@Test
+	public void requestPostBookOk() {
+		String jsonBody = """
+			{
+			"title": "Harry Potter and the Philosophers Stone",
+			"author": "J.K. Rowling",
+			"year": 1997,
+			"publisher": "Bloomsbury (UK)",
+			"description": "A book about a wizard boy"
+			}
+			""";
+
+		try {
+			when(bookService.addBook(any(Book.class))).thenReturn(true);
+			mockMvc.perform(post("/books")
+				.content(jsonBody)
+				.contentType("application/json")
+				.characterEncoding("utf-8"))
+				.andDo(print())
+				.andExpect(status().isOk());
+		} catch (Exception e) {
+			System.out.println("Exception: " + e);
+		}
+	}
+
+	@Test
+	public void requestPostBookBadTitle() {
+		String jsonBody = """
+			{
+			"author": "J.K. Rowling",
+			"year": 1997,
+			"publisher": "Bloomsbury (UK)",
+			"description": "A book about a wizard boy"
+			}
+			""";
+
+		try {
+			when(bookService.addBook(any(Book.class))).thenReturn(false);
+			mockMvc.perform(post("/books")
+					.content(jsonBody)
+					.contentType("application/json")
+					.characterEncoding("utf-8"))
+					.andDo(print())
+					.andExpect(status().isBadRequest());
+		} catch (Exception e) {
+			System.out.println("Exception: " + e);
+		}
+	}
+
+	@Test
+	public void requestPostBookBadAuthor() {
+		String jsonBody = """
+			{
+			"title": "Harry Potter and the Philosophers Stone",
+			"year": 1997,
+			"publisher": "Bloomsbury (UK)",
+			"description": "A book about a wizard boy"
+			}
+			""";
+
+		try {
+			when(bookService.addBook(any(Book.class))).thenReturn(false);
+			mockMvc.perform(post("/books")
+					.content(jsonBody)
+					.contentType("application/json")
+					.characterEncoding("utf-8"))
+					.andDo(print())
+					.andExpect(status().isBadRequest());
+		} catch (Exception e) {
+			System.out.println("Exception: " + e);
+		}
+	}
+
+	@Test
+	public void requestPostBookBadYear() {
+		String jsonBody = """
+			{
+			"title": "Harry Potter and the Philosophers Stone",
+			"author": "J.K. Rowling",
+			"publisher": "Bloomsbury (UK)",
+			"description": "A book about a wizard boy"
+			}
+			""";
+
+		try {
+			when(bookService.addBook(any(Book.class))).thenReturn(false);
+			mockMvc.perform(post("/books")
+					.content(jsonBody)
+					.contentType("application/json")
+					.characterEncoding("utf-8"))
+					.andDo(print())
+					.andExpect(status().isBadRequest());
+		} catch (Exception e) {
+			System.out.println("Exception: " + e);
+		}
+	}
+
+	@Test
+	public void getAllBooks() {
+		String book1 = """
+				{
+				"title": "Harry Potter and the Philosophers Stone",
+				"author": "J.K. Rowling",
+				"year": 1997,
+				"publisher": "Bloomsbury (UK)",
+				"description": "A book about a wizard boy"
+				}
+			""";
+
+		String book2 = """
+				{
+				 "title": "Old Testament",
+				 "author": "Various",
+				 "year": -165,
+				 "description": "A holy book of Christianity and Jewish faith"
+				 }
+					 
+			""";
+
+		try {
+			when(bookService.addBook(any(Book.class))).thenReturn(true);
+			mockMvc.perform(post("/books")
+					.content(book1)
+					.contentType("application/json")
+					.characterEncoding("utf-8"))
+					.andDo(print())
+					.andExpect(status().isOk());
+
+			mockMvc.perform(post("/books")
+					.content(book2)
+					.contentType("application/json")
+					.characterEncoding("utf-8"))
+					.andDo(print())
+					.andExpect(status().isOk());
+
+			List<Book> books = new ArrayList<>();
+			books.add(new Book(
+					"Harry Potter and the Philosophers Stone",
+					"J.K. Rowling",
+					1997,
+					"Bloomsbury (UK)",
+					"A book about a wizard boy"));
+			books.add(new Book(
+					"Old Testament",
+					"Various",
+					-165,
+					null,
+					"A holy book of Christianity and Jewish faith"));
+
+			when(bookService.getAllBooks()).thenReturn(books);
+			mockMvc.perform(get("/books"))
+					.andDo(print())
+					.andExpect(status().isOk());
+		} catch (Exception e) {
+			System.out.println("Exception: " + e);
+		}
+	}
+
+
 }

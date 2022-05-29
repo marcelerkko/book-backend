@@ -2,7 +2,9 @@ package com.application.book.controller;
 
 import com.application.book.model.Book;
 import com.application.book.service.BookService;
+import com.application.book.exception.IllegalEntityException;
 import org.json.JSONObject;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,17 +33,17 @@ public class BookController {
         if (author != null) {
             if (author.length() == 0)
                 return ResponseEntity.badRequest().build();
-            books = books.stream().filter( book -> book.getAuthor().equals(author)).collect(Collectors.toList());;
+            books = books.stream().filter( book -> book.getAuthor().equals(author)).collect(Collectors.toList());
         }
         // filter list by year
         if (year != null) {
-            books = books.stream().filter( book -> book.getYear().equals(year)).collect(Collectors.toList());;
+            books = books.stream().filter( book -> book.getYear().equals(year)).collect(Collectors.toList());
         }
         // filter list by publisher
         if (publisher != null) {
             if (publisher.length() == 0)
                 return ResponseEntity.badRequest().build();
-            books = books.stream().filter( book -> book.getPublisher().equals(publisher)).collect(Collectors.toList());;
+            books = books.stream().filter( book -> book.getPublisher().equals(publisher)).collect(Collectors.toList());
         }
 
         return ResponseEntity.ok().body(books);
@@ -58,12 +60,15 @@ public class BookController {
 
     @PostMapping("/books")
     public ResponseEntity<?> postBook(@RequestBody Book book) {
-        if (bookService.addBook(book)) {
-            JSONObject json = new JSONObject()
-                    .put("id", book.getId());
-            return ResponseEntity.ok().body(json.toString());
+        try {
+            bookService.addBook(book);
+        } catch (IllegalEntityException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        return ResponseEntity.badRequest().build();
+
+        JSONObject json = new JSONObject()
+                .put("id", book.getId());
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(json.toString());
     }
 
     @DeleteMapping("/books/{id}")

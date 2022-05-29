@@ -1,6 +1,7 @@
 package com.application.book.service;
 
 import com.application.book.model.Book;
+import com.application.book.exception.IllegalEntityException;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public interface BookService {
     List<Book> getBooksByYear(Integer year);
     List<Book> getBooksByPublisher(String publisher);
 
-    boolean addBook(Book book);
+    boolean addBook(Book book) throws IllegalEntityException;
 
     boolean deleteBook(Integer id);
 }
