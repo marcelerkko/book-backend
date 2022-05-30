@@ -1,11 +1,11 @@
 package com.application.book.service.impl;
 
+import com.application.book.exception.MySQLiteException;
 import com.application.book.exception.IllegalEntityException;
 import com.application.book.model.Book;
 import com.application.book.service.BookRepository;
 import com.application.book.service.BookService;
 import org.springframework.stereotype.Service;
-import org.sqlite.SQLiteException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,15 +49,19 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public boolean addBook(Book book) throws IllegalEntityException {
-        if (!book.isValid()) {
-            throw new IllegalEntityException("Entity is missing title, author, or year");
+    public boolean addBook(Book book) throws IllegalEntityException, MySQLiteException {
+        if (book.getAuthor() == null || book.getTitle() == null || book.getYear() == null) {
+            throw new IllegalEntityException("Null author, title, or year");
+        }
+
+        if (book.getAuthor().length() == 0 || book.getTitle().length() == 0 || (book.getPublisher() != null && book.getPublisher().length() == 0)) {
+            throw new IllegalEntityException("Empty author, title, or publisher");
         }
 
         try {
-            bookRepository.save(book); // documentation shows it throws below exception if arguments are illegal
-        } catch (Exception e) {
-            return false;
+            bookRepository.save(book);
+        } catch (Exception e) { // IllegalArgumentException and SQLiteException possible, first handled above
+            throw new MySQLiteException("Error adding book to database");
         }
         return true;
     }

@@ -1,5 +1,6 @@
 package com.application.book.service;
 
+import com.application.book.exception.MySQLiteException;
 import com.application.book.model.Book;
 import com.application.book.exception.IllegalEntityException;
 
@@ -15,7 +16,7 @@ public interface BookService {
     List<Book> getBooksByYear(Integer year);
     List<Book> getBooksByPublisher(String publisher);
 
-    boolean addBook(Book book) throws IllegalEntityException;
+    boolean addBook(Book book) throws IllegalEntityException, MySQLiteException;
 
     boolean deleteBook(Integer id);
 }

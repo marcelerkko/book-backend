@@ -99,8 +99,4 @@ public class Book {
     public void setDescription(String description) {
         this.description = description;
     }
-
-    public boolean isValid() {
-        return title != null && author != null && year != null;
-    }
 }
