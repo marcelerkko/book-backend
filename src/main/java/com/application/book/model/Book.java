@@ -1,6 +1,9 @@
 package com.application.book.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.Digits;
+import java.math.BigDecimal;
+
 /**
 CREATE TABLE IF NOT EXISTS books
         (
@@ -30,7 +33,8 @@ public class Book {
     private String author;
 
     @Column(name="year", nullable = false)
-    private Integer year;
+    @Digits(integer = 5, fraction = 0)
+    private BigDecimal year;
 
     @Column(name="publisher")
     private String publisher;
@@ -39,7 +43,7 @@ public class Book {
 
     public Book() { }
 
-    public Book(String title, String author, Integer year, String publisher, String description) {
+    public Book(String title, String author, BigDecimal year, String publisher, String description) {
         this.title = title;
         this.author = author;
         this.year = year;
@@ -74,11 +78,11 @@ public class Book {
     }
 
 
-    public Integer getYear() {
+    public BigDecimal getYear() {
         return year;
     }
 
-    public void setYear(Integer year) {
+    public void setYear(BigDecimal year) {
         this.year = year;
     }
 

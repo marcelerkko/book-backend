@@ -12,16 +12,15 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -185,13 +184,13 @@ public class BookApplicationTests {
 			books.add(new Book(
 					"Harry Potter and the Philosophers Stone",
 					"J.K. Rowling",
-					1997,
+					new BigDecimal(1997),
 					"Bloomsbury (UK)",
 					"A book about a wizard boy"));
 			books.add(new Book(
 					"Old Testament",
 					"Various",
-					-165,
+					new BigDecimal(-165),
 					null,
 					"A holy book of Christianity and Jewish faith"));
 

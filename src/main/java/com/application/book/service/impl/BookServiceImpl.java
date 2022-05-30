@@ -59,8 +59,10 @@ public class BookServiceImpl implements BookService {
         }
 
         try {
+            System.out.println(book.getYear());
             bookRepository.save(book);
         } catch (Exception e) { // IllegalArgumentException and SQLiteException possible, first handled above
+            e.printStackTrace();
             throw new MySQLiteException("Error adding book to database");
         }
         return true;

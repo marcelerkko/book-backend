@@ -2,21 +2,13 @@ package com.application.book.controller;
 
 import com.application.book.exception.MySQLiteException;
 import com.application.book.model.Book;
-import com.application.book.model.Year;
 import com.application.book.service.BookService;
 import com.application.book.exception.IllegalEntityException;
 import org.json.JSONObject;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.Part;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,8 +37,8 @@ public class BookController {
         // filter list by year
         if (year != null) {
             try {
-                Integer intYear = Integer.parseInt(year);
-                books = books.stream().filter( book -> book.getYear().equals(intYear)).collect(Collectors.toList());
+                int intYear = Integer.parseInt(year);
+                books = books.stream().filter( book -> book.getYear().intValue() == intYear).collect(Collectors.toList());
             } catch (NumberFormatException e) {
                 return ResponseEntity.badRequest().body("Bad year parameter");
             }
